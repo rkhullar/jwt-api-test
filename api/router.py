@@ -1,9 +1,10 @@
-from fastapi import APIRouter
-from .model.key import PublicKey, PrivateKey
-from .depends import atlas
 from collections.abc import AsyncIterator
-from .util import async_list
 
+from fastapi import APIRouter
+
+from .depends import atlas
+from .model.key import PrivateKey, PublicKey
+from .util import async_list
 
 router = APIRouter()
 JWKAdapter = atlas(name='key', database='jwt-api')

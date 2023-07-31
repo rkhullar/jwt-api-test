@@ -1,9 +1,10 @@
-from pathlib import Path
-import json
-from api.model.key import PrivateKey
 import asyncio
-from api.util import build_atlas_client
+import json
+from pathlib import Path
+
 from api.config import Settings
+from api.model.key import PrivateKey
+from api.util import build_atlas_client
 
 
 def load_key(name: str) -> PrivateKey:

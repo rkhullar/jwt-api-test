@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from .config import Settings
 from .router import router as api_router
 from .util import build_atlas_client
