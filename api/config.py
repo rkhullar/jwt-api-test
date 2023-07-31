@@ -13,5 +13,10 @@ class NetworkSettings(BaseSettings):
     service_port: int = int(os.getenv('SERVICE_PORT', '8000'))
 
 
-class Settings(ProjectSettings, NetworkSettings):
+class MongoSettings(BaseSettings):
+    atlas_host: str = os.environ['ATLAS_HOST']
+    # local_mode: bool = 'LOCAL_MODE' in os.environ
+
+
+class Settings(ProjectSettings, NetworkSettings, MongoSettings):
     pass

@@ -5,8 +5,9 @@ name = "pypi"
 
 [packages]
 fastapi = "*"
-pydantic-settings = "*"
 mangum = "*"
+pydantic-settings = "*"
+pymongo = {version = "~=4.4.0", extras = ["aws", "srv"]}
 
 [dev-packages]
 uvicorn = "*"
