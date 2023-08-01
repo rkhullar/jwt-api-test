@@ -5,5 +5,5 @@ from api.config import Settings
 from api.factory import create_app
 
 settings: Settings = Settings()
-app: FastAPI = create_app(settings)
+app: FastAPI = create_app(settings, docs=False)
 lambda_handler: Mangum = Mangum(app)

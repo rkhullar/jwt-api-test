@@ -33,7 +33,18 @@ async def list_public_keys(collection: JWKAdapter):
     return PublicKeysResponse(keys=await async_list(process()))
 
 
+'''
 @router.get('/.well-known/oauth-authorization-server')
+async def metadata():
+    base_url = 'https://api-dev.example.nydev.me/jwt-server'
+    return {
+        'issuer': base_url,
+        'jwks_uri': f'{base_url}/public-keys'
+    }
+'''
+
+
+@router.get('/.well-known/openid-configuration')
 async def metadata():
     base_url = 'https://api-dev.example.nydev.me/jwt-server'
     return {
