@@ -5,9 +5,12 @@ from .model.key import PrivateKey
 from .util import async_list
 from .schema.key import PublicKeysResponse, PublicKeyForClient
 import jwt
+import datetime as dt
+import calendar
 
 router = APIRouter()
 JWKAdapter = atlas(name='key', database='jwt-api')
+base_url = 'https://api-dev.example.nydev.me/jwt-server'
 
 
 @router.get('/hello')
@@ -15,11 +18,26 @@ async def hello_world():
     return {'message': 'hello world'}
 
 
+def to_epoch(timestamp: dt.datetime) -> int:
+    # NOTE: don't use the following:
+    # return int(timestamp.strftime('%s'))
+    # NOTE: instead do this:
+    return calendar.timegm(timestamp.timetuple())
+
+
 @router.post('/sign')
 async def sign_data(collection: JWKAdapter, data: dict = Body(...)):
     doc = collection.find_one()
     private_key = PrivateKey(**doc)
-    return jwt.encode(payload=data, key=private_key.pem, algorithm='RS256')
+    now = dt.datetime.utcnow()
+    exp = now + dt.timedelta(minutes=5)
+    jwt_metadata = dict(
+        iss=base_url,
+        aud='api://default',
+        iat=to_epoch(now),
+        exp=to_epoch(exp)
+    )
+    return jwt.encode(payload={**jwt_metadata, **data}, key=private_key.pem, algorithm='RS256', headers={'kid': private_key.kid})
 
 
 @router.get('/public-keys', response_model=PublicKeysResponse)
@@ -33,20 +51,8 @@ async def list_public_keys(collection: JWKAdapter):
     return PublicKeysResponse(keys=await async_list(process()))
 
 
-'''
-@router.get('/.well-known/oauth-authorization-server')
-async def metadata():
-    base_url = 'https://api-dev.example.nydev.me/jwt-server'
-    return {
-        'issuer': base_url,
-        'jwks_uri': f'{base_url}/public-keys'
-    }
-'''
-
-
 @router.get('/.well-known/openid-configuration')
 async def metadata():
-    base_url = 'https://api-dev.example.nydev.me/jwt-server'
     return {
         'issuer': base_url,
         'jwks_uri': f'{base_url}/public-keys'
