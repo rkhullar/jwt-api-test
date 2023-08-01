@@ -8,6 +8,7 @@ fastapi = "*"
 mangum = "*"
 pydantic-settings = "*"
 pymongo = {version = "~=4.4.0", extras = ["aws", "srv"]}
+pyjwt = {version = "*", extras = ["crypto"]}
 
 [dev-packages]
 uvicorn = "*"
