@@ -5,13 +5,10 @@ name = "pypi"
 
 [packages]
 fastapi = "~=0.100.0"
+mangum = "~=0.17.0"
 pydantic-settings = "~=2.0.0"
 pymongo = {version = "~=4.4.0", extras = ["aws", "srv"]}
 pyjwt = {version = "~=2.0.0", extras = ["crypto"]}
-
-[dev-packages]
-uvicorn = "~=0.23.0"
-isort = "~=5.12.0"
 
 [requires]
 python_version = "3.11"
