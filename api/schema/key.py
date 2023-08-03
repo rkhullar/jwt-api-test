@@ -1,5 +1,6 @@
-from ..model.key import PublicKey
 from pydantic import BaseModel
+
+from ..model.key import PublicKey
 
 
 class PublicKeyForClient(PublicKey):

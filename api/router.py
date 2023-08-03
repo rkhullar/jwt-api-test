@@ -1,13 +1,15 @@
+import calendar
+import datetime as dt
 from collections.abc import AsyncIterator
+
+import jwt
 from fastapi import APIRouter, Body
+
 from .depends import atlas
 from .model.key import PrivateKey
-from .util import async_list
-from .schema.key import PublicKeysResponse, PublicKeyForClient
+from .schema.key import PublicKeyForClient, PublicKeysResponse
 from .schema.oidc import DiscoveryMetadata, SignData
-import jwt
-import datetime as dt
-import calendar
+from .util import async_list
 
 router = APIRouter()
 JWKAdapter = atlas(name='key', database='jwt-api')
@@ -35,18 +37,15 @@ async def test_capture_payload(data: dict = Body(...)):
 async def sign_data(collection: JWKAdapter, request: SignData):
     doc = collection.find_one()
     private_key = PrivateKey(**doc)
-
-    return request
-
-    # now = dt.datetime.utcnow()
-    # exp = now + dt.timedelta(minutes=5)
-    # jwt_metadata = dict(
-    #     iss=base_url,
-    #     aud='api://default',
-    #     iat=to_epoch(now),
-    #     exp=to_epoch(exp)
-    # )
-    # return jwt.encode(payload={**jwt_metadata, **data}, key=private_key.pem, algorithm='RS256', headers={'kid': private_key.kid})
+    now = dt.datetime.utcnow()
+    exp = now + dt.timedelta(seconds=request.metadata.duration)
+    jwt_metadata = dict(
+        iss=base_url,
+        aud=request.metadata.audience,
+        iat=to_epoch(now),
+        exp=to_epoch(exp)
+    )
+    return jwt.encode(payload={**jwt_metadata, **request.data}, key=private_key.pem, algorithm='RS256', headers={'kid': private_key.kid})
 
 
 @router.get('/public-keys', response_model=PublicKeysResponse)
