@@ -34,6 +34,10 @@ class SignData(BaseModel):
     metadata: SignMetadata = SignMetadata(duration=3600)
 
 
+class SignDataResponse(BaseModel):
+    access_token: str
+
+
 if __name__ == '__main__':
     payload = {
         'data': {},

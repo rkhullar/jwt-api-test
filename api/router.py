@@ -8,7 +8,7 @@ from fastapi import APIRouter, Body
 from .depends import atlas
 from .model.key import PrivateKey
 from .schema.key import PublicKeyForClient, PublicKeysResponse
-from .schema.oidc import DiscoveryMetadata, SignData
+from .schema.oidc import DiscoveryMetadata, SignData, SignDataResponse
 from .util import async_list
 
 router = APIRouter()
@@ -33,7 +33,7 @@ async def test_capture_payload(data: dict = Body(...)):
     return data
 
 
-@router.post('/sign')
+@router.post('/sign', response_model=SignDataResponse)
 async def sign_data(collection: JWKAdapter, request: SignData):
     doc = collection.find_one()
     private_key = PrivateKey(**doc)
@@ -45,7 +45,9 @@ async def sign_data(collection: JWKAdapter, request: SignData):
         iat=to_epoch(now),
         exp=to_epoch(exp)
     )
-    return jwt.encode(payload={**jwt_metadata, **request.data}, key=private_key.pem, algorithm='RS256', headers={'kid': private_key.kid})
+    return SignDataResponse(
+        access_token=jwt.encode(payload={**jwt_metadata, **request.data}, key=private_key.pem, algorithm='RS256', headers={'kid': private_key.kid})
+    )
 
 
 @router.get('/public-keys', response_model=PublicKeysResponse)
