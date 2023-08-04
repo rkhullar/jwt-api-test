@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 import jwt
 from fastapi import APIRouter, Body
 
-from .depends import atlas, ReadSettings
+from .depends import ReadSettings, atlas
 from .model.key import PrivateKey
 from .schema.key import PublicKeyForClient, PublicKeysResponse
 from .schema.oidc import DiscoveryMetadata, SignData, SignDataResponse
