@@ -36,22 +36,3 @@ class SignData(BaseModel):
 
 class SignDataResponse(BaseModel):
     access_token: str
-
-
-if __name__ == '__main__':
-    payload = {
-        'data': {},
-        'metadata': {
-            'duration': 15 * 60,
-            'audience': 'test'
-        }
-    }
-    request = SignData.model_validate(payload)
-    # print(request)
-
-
-    # test default metadata doesn't overlap
-    # a = SignData(data={'t': 1})
-    # b = SignData(data={'t': 2})
-    # b.metadata.duration = 4
-    # print(a, b)

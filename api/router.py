@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 import jwt
 from fastapi import APIRouter, Body
 
-from .depends import atlas
+from .depends import atlas, ReadSettings
 from .model.key import PrivateKey
 from .schema.key import PublicKeyForClient, PublicKeysResponse
 from .schema.oidc import DiscoveryMetadata, SignData, SignDataResponse
@@ -13,7 +13,6 @@ from .util import async_list
 
 router = APIRouter()
 JWKAdapter = atlas(name='key', database='jwt-api')
-base_url = 'https://api-dev.example.nydev.me/jwt-server'
 
 
 @router.get('/hello')
@@ -34,13 +33,13 @@ async def test_capture_payload(data: dict = Body(...)):
 
 
 @router.post('/sign', response_model=SignDataResponse)
-async def sign_data(collection: JWKAdapter, request: SignData):
+async def sign_data(collection: JWKAdapter, settings: ReadSettings, request: SignData):
     doc = collection.find_one()
     private_key = PrivateKey(**doc)
     now = dt.datetime.utcnow()
     exp = now + dt.timedelta(seconds=request.metadata.duration)
     jwt_metadata = dict(
-        iss=base_url,
+        iss=settings.issuer_url,
         aud=request.metadata.audience,
         iat=to_epoch(now),
         exp=to_epoch(exp)
@@ -62,5 +61,6 @@ async def list_public_keys(collection: JWKAdapter):
 
 
 @router.get('/.well-known/openid-configuration', response_model=DiscoveryMetadata)
-async def discovery_metadata():
-    return DiscoveryMetadata(issuer=base_url, jwks_uri=f'{base_url}/public-keys')
+async def discovery_metadata(settings: ReadSettings):
+    print(settings)
+    return DiscoveryMetadata(issuer=settings.issuer_url, jwks_uri=f'{settings.issuer_url}/public-keys')

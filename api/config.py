@@ -10,14 +10,21 @@ class ProjectSettings(BaseSettings):
 
 
 class NetworkSettings(BaseSettings):
+    # NOTE: not used for APIGW / Lambda
     service_host: str = os.getenv('SERVICE_HOST', 'localhost')
     service_port: int = int(os.getenv('SERVICE_PORT', '8000'))
+    service_scheme: str = os.getenv('SERVICE_SCHEME', 'http')
+
+    @property
+    def service_url(self) -> str:
+        return os.getenv('SERVICE_URL') or f'{self.service_scheme}://{self.service_host}:{self.service_port}'
 
 
 class MongoSettings(BaseSettings):
     atlas_host: str = os.environ['ATLAS_HOST']
-    # local_mode: bool = 'LOCAL_MODE' in os.environ
 
 
 class Settings(ProjectSettings, NetworkSettings, MongoSettings):
-    pass
+    @property
+    def issuer_url(self) -> str:
+        return os.getenv('ISSUER_URL') or self.service_url
