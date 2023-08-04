@@ -62,5 +62,4 @@ async def list_public_keys(collection: JWKAdapter):
 
 @router.get('/.well-known/openid-configuration', response_model=DiscoveryMetadata)
 async def discovery_metadata(settings: ReadSettings):
-    print(settings)
     return DiscoveryMetadata(issuer=settings.issuer_url, jwks_uri=f'{settings.issuer_url}/public-keys')
