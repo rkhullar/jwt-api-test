@@ -1,8 +1,8 @@
 ## JWT API Test
 
 ### Overview
-Testing AWS API Gateway integration with custom JSON Web Tokens. HTTP APIs can use builtin JWT authorizers to validate the
-token before application code is invoked. With this API there are three major endpoints:
+Testing AWS API Gateway integration with custom JSON Web Tokens. HTTP APIs can use builtin JWT authorizers to validate
+tokens before application code is invoked. With this API there are three major endpoints:
 - `POST /sign`
   - send arbitrary data to the server in exchange for an access token in the JWT format
   - optionally define metadata like the active token duration or the token audience
@@ -39,9 +39,9 @@ it to generate the keys.
 1. create another HTTP API gateway
    - setup another integration like a hello world lambda function
    - create JWT authorizer with the following example config
-     - name: jwt-api-dev
-     - issuer: https://{host}/jwt-server
-     - audience: api://default
+     - `name`: `jwt-api-dev`
+     - `issuer`: `https://{host}/jwt-server`
+     - `audience`: `api://default`
    - add route for `GET /{proxy+}` behind the JWT authorizer
 
 ### Testing
@@ -56,7 +56,7 @@ but the data in question needs to be customized.
 
 #### Auth Exchange
 You need to create an application workflow and support login with from a third party. For example, you want to support login
-via Twitter. The oauth for Twitter free tier is heavily rate limited at 25 requests / user / 24 hours. So you can have the
+via Twitter. The oauth for Twitter free tier is heavily rate limited at 25 requests per user per 24 hours. So you can have the
 user login, but you cannot verify their access token for each request to your backend.
 
 This is where the custom JWT could help. If you build an endpoint to exchange the user's Twitter access token for a JWT
@@ -67,7 +67,7 @@ each client side request to your backend can be verified with your AWS JWT autho
 
 #### Trusted Uploads
 Your application has functionality for users to upload pictures or documents. The frontend calls your backend endpoint
-with an access token from an authorization service like okta, auth0, or cognito. The backend responds with an AWS
+with an access token from an identity management service like okta, auth0, or cognito. The backend responds with an AWS
 presigned s3 post, and the frontend that to perform the upload directly to the s3 bucket.
 
 For this use case the concept of the custom JWT can add additional security in the opposite direction. We want to reassure
