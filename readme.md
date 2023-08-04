@@ -50,6 +50,19 @@ it to generate the keys.
    - do this locally only, unless you added the secure POST route in the auth server deployment
 3. add bearer token authorization to your postman request, and include the generated token. now it should respond with 200
 
+### Caveats
+#### Production Grade Availability
+The custom server needs to deployed such that the oidc config endpoint and jwks url are highly available. If you deploy them
+with lambda, you may need to enable provisioned concurrency to optimize the response times on those endpoints. You may also
+want to consider other architecture components like cloudfront, alb, and ecs fargate. And some other consideration would
+be around multi region deployments and security measures like AWS WAF and Shield.
+
+#### Refresh Tokens
+This prototype did not cover refresh tokens. I'd imagine that it might be possible to implement, but it would be significantly
+more complex. It would probably mean implementing more oidc discovery endpoints, like `authorization_endpoint`, `token_endpoint`,
+and `token_endpoint`. [Authlib][authlib-pypi] could probably help with this. They have documentation for how to create
+oauth / oidc servers [here][authlib-flask-oidc].
+
 ### Practical Use Cases
 The concept for the custom JWT server can be useful for situations where efficient trust is needed between a client and server
 but the data in question needs to be customized.
@@ -73,19 +86,6 @@ presigned s3 post, and the frontend that to perform the upload directly to the s
 For this use case the concept of the custom JWT can add additional security in the opposite direction. We want to reassure
 users of our application that their uploads are going to the correct location. So if we JWT encode the AWS presigned post,
 and sign with our JWK, then the frontend can verify the JWT signature and trust that the post data has not been modified.
-
-### Caveats
-#### Production Grade Availability
-The custom server needs to deployed such that the oidc config endpoint and jwks url are highly available. If you deploy them
-with lambda, you may need to enable provisioned concurrency to optimize the response times on those endpoints. You may also
-want to consider other architecture components like cloudfront, alb, and ecs fargate. And some other consideration would
-be around multi region deployments and security measures like AWS WAF and Shield.
-
-#### Refresh Tokens
-This prototype did not cover refresh tokens. I'd imagine that it might be possible to implement, but it would be significantly
-more complex. It would probably mean implementing more oidc discovery endpoints, like `authorization_endpoint`, `token_endpoint`,
-and `token_endpoint`. [Authlib][authlib-pypi] could probably help with this. They have documentation for how to create
-oauth / oidc servers [here][authlib-flask-oidc].
 
 [okta-create-service-app]: https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/#create-a-service-app-integration
 [authlib-pypi]: https://pypi.org/project/Authlib
